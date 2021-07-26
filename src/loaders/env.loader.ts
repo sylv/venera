@@ -10,7 +10,6 @@ export interface EnvLoaderOptions {
   cwd?: string;
 }
 
-// todo: test for load order, .env.development should take priority over .env variables
 export class EnvLoader extends Loader {
   private static readonly VALID_ENVIRONMENTS = new Set(["development", "production", "staging", "test"]);
   private static readonly COMMENT_REGEX = /(?<=^| )#.*$/gm;

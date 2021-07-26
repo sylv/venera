@@ -122,7 +122,6 @@ const data = loadConfig<Partial<AppConfig>>("app-name", {
 
 ## todo
 
-- [ ] Tests that ensure we're loading things in order - environment variables should be loaded last so they have priority, etc.
 - [ ] Option to turn off merging and instead just return the first config found. This would have to be implemented per-loader to make sense, because I think it would be nice if you could turn off merging and still override .rc values with environment variables, sometimes its just convenient.
 - [ ] Output sources for each config value, maybe even per-property with symbols declaring which properties are from where so you could do something like `The key CLIENT_TOKEN in config /home/user/.env is invalid` or something.
 - [ ] TOML/INI support? The more file system loaders are added the more startup slows down checking for all of them, realistically I think YAML is as human-readable as you need anyway, but it would be nice to throw in.
