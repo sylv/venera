@@ -14,15 +14,15 @@ Another config loader, intended for loading configuration files for services. Fo
 
 - `--arg="values"` from process.argv
 - Environment variables, prefixed with the app name.
-  - Prefixed keys are required - if your app name was "Atlas", you should define keys as `ATLAS_API_KEY` and `ATLAS_API_SECRET`.
+  - Prefixed keys are **required** - if your app name was "Atlas", you should define keys as `ATLAS_API_KEY` and `ATLAS_API_SECRET`.
   - For nested values, use double underscores. `ATLAS_CLIENT__KEY` will be accessible as `client.key`
 - .env files in the current directory or up.
   - `.env` and `.env.local` in any environment
   - `.env.staging`, `.env.development`, `.env.production`, `.env.test` in their respective environments based on `process.env.NODE_ENV`
-  - Prefixes are **necessary** in .env files to prevent ambiguity with `process.env` variables that also require a prefix. Keys without a prefix are ignored.
+  - Prefixes are **required** in .env files to prevent ambiguity with `process.env` variables that also require a prefix. Keys without a prefix are ignored.
   - Double underscores are supported for nested keys. `CLIENT__KEY` would be loaded as `client.key`
-  - If there are multiple environment files found, their values will be merged.
-- Config files in the locations you would expect.
+  - If there are multiple environment files found such as `.env` and `.env.staging`, their values will be merged preferring values from `.env.staging`.
+- Config files in the [locations you would expect](https://github.com/sylv/venera/blob/main/src/loaders/fs/fs.loader.ts#L23).
   - JSON files are supported with or without paths, such as `.apprc`. Comments are supported.
   - For other formats, an extension is required to remove ambiguity. For YAML, you would use `.apprc.yaml`, etc.
 
