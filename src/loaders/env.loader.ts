@@ -1,10 +1,10 @@
-import { camelCase } from "camel-case";
 import { constantCase } from "constant-case";
-import { Loader } from "./loader";
-import findUp from "find-up";
-import fs from "fs";
+import { findUpSync } from "find-up";
 import flat from "flat";
-import { constantCaseToPath } from "../helpers/constant-case-to-path.helper";
+import fs from "fs";
+import { constantCaseToPath } from "../helpers/constant-case-to-path.js";
+import { coerceValue } from "../index.js";
+import { Loader } from "./loader.js";
 
 export interface EnvLoaderOptions {
   cwd?: string;
@@ -27,7 +27,7 @@ export class EnvLoader extends Loader {
     const fileNames = [".env", ".env.local"];
     if (nodeEnv) fileNames.unshift(`.env.${nodeEnv.toLowerCase()}`);
     for (const fileName of fileNames) {
-      const filePath = findUp.sync(fileName, { cwd: this.cwd });
+      const filePath = findUpSync(fileName, { cwd: this.cwd });
       if (!filePath) continue;
       const fileContent = fs.readFileSync(filePath);
       const parsed = this.parse(fileContent.toString());
@@ -58,7 +58,7 @@ export class EnvLoader extends Loader {
     const lines = content.toString().trim().replace(EnvLoader.COMMENT_REGEX, "").split("\n");
     const result: Record<string, any> = {};
     for (let idx = 0; idx < lines.length; idx++) {
-      const line = lines[idx];
+      const line = lines[idx]!;
       let [key, value] = line.trim().split("=");
       if (!key) continue;
       if (!value) throw new Error(`Malformed .env content on line ${idx + 1}: "${line}"`);
@@ -69,7 +69,7 @@ export class EnvLoader extends Loader {
         value = value.slice(1, -1).replace(EnvLoader.NEWLINE_REGEX, "\n");
       }
 
-      result[key] = value;
+      result[key] = coerceValue(value);
     }
 
     return result;

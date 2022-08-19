@@ -1,5 +1,6 @@
-import { EnvLoader } from "./env.loader";
+import { EnvLoader } from "./env.loader.js";
 import mock from "mock-fs";
+import { afterAll, describe, it, expect } from "vitest";
 
 afterAll(() => {
   mock.restore();
@@ -88,5 +89,14 @@ describe("parser", () => {
   it("should throw on malformed .env lines", () => {
     const loader = new EnvLoader();
     expect(() => loader.parse("not a valid line :)")).toThrow(/malformed \.env content on line/i);
+  });
+
+  it("should coerce booleans/numbers", () => {
+    const loader = new EnvLoader();
+    const input = `BOOLEAN=true\nNUMBER=1.1\nSTRING=test string`;
+    const output = loader.parse(input);
+    expect(output.BOOLEAN).toBe(true);
+    expect(output.NUMBER).toBe(1.1);
+    expect(output.STRING).toBe("test string");
   });
 });
