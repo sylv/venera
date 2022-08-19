@@ -1,12 +1,16 @@
 {
   "name": "@ryanke/venera",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Another config loader.",
   "repository": "https://github.com/sylv/venera.git",
   "author": "Ryan <ryan@sylver.me>",
   "license": "MIT",
   "type": "module",
   "exports": "./dist/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
   "engines": {
     "node": ">=16"
   },
