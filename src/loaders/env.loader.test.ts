@@ -70,6 +70,18 @@ describe("loader", () => {
       "/app/.env.development": "TEST_KEY_TWO=two",
     });
   });
+
+  it("should coerce boolean/number values", () => {
+    process.env.APP_BOOL = "true";
+    mock({
+      "/app/.env": "APP_INT=1",
+    });
+
+    const loader = new EnvLoader("/app");
+    const output = loader.load("app");
+    expect(output.bool).toBe(true);
+    expect(output.int).toBe(1);
+  });
 });
 
 describe("parser", () => {

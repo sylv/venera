@@ -48,7 +48,10 @@ export class EnvLoader extends Loader {
       // prefixes are required for process.env variables
       const withoutPrefix = key.substring(prefix.length);
       const path = constantCaseToPath(withoutPrefix);
-      flattened[path] = process.env[key];
+      const value = process.env[key];
+      if (value !== undefined) {
+        flattened[path] = coerceValue(value);
+      }
     }
 
     return flat.unflatten<Record<string, string>, Record<string, any>>(flattened);
