@@ -1,6 +1,7 @@
 import mock from "mock-fs";
+import { afterAll, beforeAll, expect, it } from "vitest";
 import yaml from "yaml";
-import { YAMLLoader } from "./yaml.loader";
+import { YAMLLoader } from "./yaml.loader.js";
 
 const FILE_CONTENT = {
   clientToken: "value",

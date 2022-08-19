@@ -1,44 +1,38 @@
 {
   "name": "@ryanke/venera",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Another config loader.",
   "repository": "https://github.com/sylv/venera.git",
   "author": "Ryan <ryan@sylver.me>",
   "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
-    "test": "jest",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "vitest run",
+    "build": "tsup src/index.ts --format esm --dts",
     "prepack": "pnpm run build"
   },
   "devDependencies": {
     "@types/flat": "^5.0.2",
-    "@types/jest": "^26.0.24",
     "@types/minimist": "^1.2.2",
     "@types/mock-fs": "^4.13.1",
-    "@types/node": "^14.14.20",
-    "class-validator": "^0.13.1",
-    "jest": "^26",
-    "mock-fs": "^5.0.0",
-    "reflect-metadata": "^0.1.13",
-    "tsup": "^4.12.5"
-  },
-  "peerDependencies": {
-    "class-validator": "^0.13.1",
-    "reflect-metadata": "^0.1.13"
+    "@types/node": "^16",
+    "mock-fs": "^5.1.4",
+    "tsup": "^6.2.2",
+    "typescript": "^4.7.4",
+    "vitest": "^0.22.1"
   },
   "dependencies": {
     "camel-case": "^4.1.2",
-    "class-transformer": "^0.4.0",
-    "comment-json": "^4.1.0",
+    "comment-json": "^4.2.3",
     "constant-case": "^3.0.4",
-    "esbuild-jest": "^0.5.0",
-    "find-up": "^5.0.0",
+    "find-up": "^6.3.0",
     "flat": "^5.0.2",
     "merge": "^2.1.1",
-    "minimist": "^1.2.5",
-    "yaml": "^1.10.2"
+    "minimist": "^1.2.6",
+    "yaml": "^2.1.1"
   }
 }

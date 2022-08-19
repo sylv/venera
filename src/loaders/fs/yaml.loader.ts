@@ -1,5 +1,5 @@
 import yaml from "yaml";
-import { FSLoader, FSLoaderData } from "./fs.loader";
+import { FSLoader, FSLoaderData } from "./fs.loader.js";
 
 export class YAMLLoader extends FSLoader {
   readonly extensions = ["yaml", "yml"];

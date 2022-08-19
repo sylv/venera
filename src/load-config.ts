@@ -1,10 +1,10 @@
-import merge from "merge";
-import { LoaderResolvable } from "../dist";
-import { ArgsLoader } from "./loaders/args.loader";
-import { EnvLoader } from "./loaders/env.loader";
-import { JSONLoader } from "./loaders/fs/json.loader";
-import { YAMLLoader } from "./loaders/fs/yaml.loader";
-import { resolveLoaders } from "./resolve-loaders";
+import { default as merge } from "merge";
+import { ArgsLoader } from "./loaders/args.loader.js";
+import { EnvLoader } from "./loaders/env.loader.js";
+import { JSONLoader } from "./loaders/fs/json.loader.js";
+import { YAMLLoader } from "./loaders/fs/yaml.loader.js";
+import { resolveLoaders } from "./resolve-loaders.js";
+import type { LoaderResolvable } from "./resolve-loaders.js";
 
 export const DEFAULT_LOADERS: LoaderResolvable[] = [JSONLoader, YAMLLoader, ArgsLoader, EnvLoader];
 

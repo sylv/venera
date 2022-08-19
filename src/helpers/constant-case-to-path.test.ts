@@ -1,4 +1,5 @@
-import { constantCaseToPath } from "./constant-case-to-path.helper";
+import { expect, it } from "vitest";
+import { constantCaseToPath } from "./constant-case-to-path.js";
 
 it("should convert constant case to camel case", () => {
   expect(constantCaseToPath("TEST_KEY")).toBe("testKey");

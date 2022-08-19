@@ -1,7 +1,7 @@
 import minimist from "minimist";
-import { constantCaseToPath } from "../helpers/constant-case-to-path.helper";
+import { constantCaseToPath } from "../helpers/constant-case-to-path.js";
 import flat from "flat";
-import { Loader } from "./loader";
+import { Loader } from "./loader.js";
 
 export class ArgsLoader extends Loader {
   public load(appName: string) {

@@ -29,50 +29,18 @@ Another config loader, intended for loading configuration files for services. Fo
 ## usage
 
 ```ts
-import "reflect-metadata";
-import { Type } from "class-transformer";
-import { IsDefined, IsNumber, IsString, ValidateNested } from "class-validator";
-import { loadConfig, validateConfig } from "@ryanke/venera";
-import mock from "mock-fs"; // unnecessary in real world use, this is just for the example
+import { loadConfig } from "@ryanke/venera";
+import mock from "mock-fs";
 
-export class RedisConfig {
-  @IsString()
-  host = "localhost";
-
-  // @Type(...) is necessary for class-transformer to convert a string to an int
-  // which is required when using something like env variables where its all strings.
-  @Type(() => Number)
-  @IsNumber()
-  port = 6379;
-
-  @IsString()
-  password: string;
-
-  public get url() {
-    return `redis://${this.password}@${this.host}:${this.port}`;
-  }
-}
-
-// you might have to set "strictPropertyInitialization" to false in your tsconfig.json,
-// or do "message!: ..." to get typescript to let it slide
-export class AppConfig {
-  @IsString()
-  message: string;
-
-  // class-validator handles nested validation poorly, so IsDefined is necessary
-  // or else `redis: undefined` will pass validation
-  @ValidateNested()
-  @IsDefined()
-  @Type(() => RedisConfig)
-  redis: RedisConfig;
-}
-
-// this mocks file system files for tests and since im lazy and dont want to make this a multi-file example,
-// im using it here. in practice this step is unnecessary
+// create some fake files on disk, totally unnecessary for
+// real world use but to keep this example simple
 mock({
-  // set nested properties with environment variables
-  "./.env": "VENERA_REDIS__PASSWORD=youshallnotpass",
-  "./.venerarc.json": JSON.stringify({
+  // prefixed environment variables
+  "./.env": "MYAPP_REDIS__PASSWORD=youshallnotpass",
+  // numbers/booleans in env variables will be parsed as numbers/booleans
+  "./.env": "MYAPP_REDIS__PORT=6379",
+  // config files in standard locations or in any current/parent directory
+  "./.myapprc.json": JSON.stringify({
     message: "Very cool",
     redis: {
       // override default values
@@ -81,17 +49,22 @@ mock({
   }),
 });
 
-// "venera" should be replaced with the name of your app. if this were "app-name", venera would
-// look for ".my-apprc.yaml" files, "MY_APP_VARIABLE" environment variables, etc
-// if you wanted, you could skip validation and use "data" directly, but defaults wont
-// be applied and transforms (eg converting strings from env variables to numbers) wont be applied.
-const data = loadConfig("venera");
-// validate the config, throwing an error if the config doesn't match our schema.
-const config = validateConfig(AppConfig, data);
-// "config" is now an instance of AppConfig
-console.log(config);
-console.log(config.redis.url); // redis://youShallNotPass@127.0.0.1:6379
+// "venera" should be the name of your app
+const data = loadConfig("myapp");
+// data now looks like:
+// {
+//   message: "Very cool",
+//   redis: {
+//     host: "127.0.0.1",
+//     password: "youshallnotpass",
+//     port: 6379,
+//   }
+// }
 
+// "zod" is a great option to parse the resulting schema.
+// "class-validator" might also be convenient if you already use it.
+// this is of course optional, by this point its just an object.
+const config = validateConfig(data);
 export { config };
 ```
 

@@ -1,4 +1,5 @@
-import { ArgsLoader } from "./args.loader";
+import { expect, it } from "vitest";
+import { ArgsLoader } from "./args.loader.js";
 
 it("should load flags from process.argv", () => {
   process.argv.push("--test", "value");

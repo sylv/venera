@@ -1,5 +1,6 @@
 import mock from "mock-fs";
-import { JSONLoader } from "./json.loader";
+import { afterAll, beforeAll, expect, it } from "vitest";
+import { JSONLoader } from "./json.loader.js";
 
 const JSON_CONTENT = {
   clientToken: "value",

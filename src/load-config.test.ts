@@ -1,5 +1,6 @@
-import { loadConfig } from "./load-config";
+import { loadConfig } from "./load-config.js";
 import mock from "mock-fs";
+import { afterAll, expect, it, vi } from "vitest";
 
 afterAll(() => {
   mock.restore();
@@ -7,7 +8,7 @@ afterAll(() => {
 
 it("should load configs", () => {
   process.env.APP_ENV = "env";
-  jest.spyOn(process, "cwd").mockReturnValue("/project/packages/app");
+  vi.spyOn(process, "cwd").mockReturnValue("/project/packages/app");
   mock({
     "/project/packages/app/.env": "APP_KEY=env file # a test comment",
     "/project/.apprc.yaml": `yaml: 'yaml file'`,

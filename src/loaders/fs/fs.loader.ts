@@ -1,8 +1,8 @@
-import findUp from "find-up";
+import { findUpSync } from "find-up";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { Loader } from "../loader";
+import { Loader } from "../loader.js";
 
 export interface FSLoaderData {
   extension?: string;
@@ -37,7 +37,7 @@ export abstract class FSLoader extends Loader {
     }
 
     for (const relativeFile of this.getPathsWithExtensions(relativeFiles)) {
-      const absoluteFile = findUp.sync(relativeFile, { cwd: this.cwd });
+      const absoluteFile = findUpSync(relativeFile, { cwd: this.cwd });
       if (absoluteFile) {
         const parsed = this.tryLoadAbsoluteFile(absoluteFile);
         if (parsed) {
@@ -58,8 +58,8 @@ export abstract class FSLoader extends Loader {
       const extension = this.extensions.find((ext) => filePath.endsWith(`.${ext}`));
       const parsed = this.parse(content.toString(), { extension, filePath });
       if (parsed) return parsed;
-    } catch (err) {
-      if (err.code !== "ENOENT") throw err;
+    } catch (error: any) {
+      if (error.code !== "ENOENT") throw error;
     }
   }
 

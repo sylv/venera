@@ -1,4 +1,4 @@
-import { Loader } from "./loaders/loader";
+import type { Loader } from "./loaders/loader.js";
 
 export type LoaderResolvable = new () => Loader | Loader;
 
