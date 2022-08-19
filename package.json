@@ -1,6 +1,6 @@
 {
   "name": "@ryanke/venera",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Another config loader.",
   "repository": "https://github.com/sylv/venera.git",
   "author": "Ryan <ryan@sylver.me>",

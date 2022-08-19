@@ -13,7 +13,6 @@ export interface EnvLoaderOptions {
 export class EnvLoader extends Loader {
   private static readonly VALID_ENVIRONMENTS = new Set(["development", "production", "staging", "test"]);
   private static readonly COMMENT_REGEX = /(?<=^| )#.*$/gm;
-  private static readonly NEWLINE_REGEX = /\\n/g;
   constructor(private readonly cwd: string = process.cwd()) {
     super();
   }
@@ -65,13 +64,6 @@ export class EnvLoader extends Loader {
       let [key, value] = line.trim().split("=");
       if (!key) continue;
       if (!value) throw new Error(`Malformed .env content on line ${idx + 1}: "${line}"`);
-      const end = value.length - 1;
-      const isDoubleQuoted = value[0] === '"' && value[end] === '"';
-      const isSingleQuoted = value[0] === "'" && value[end] === "'";
-      if (isDoubleQuoted || isSingleQuoted) {
-        value = value.slice(1, -1).replace(EnvLoader.NEWLINE_REGEX, "\n");
-      }
-
       result[key] = coerceValue(value);
     }
 

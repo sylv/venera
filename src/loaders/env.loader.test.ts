@@ -72,15 +72,19 @@ describe("loader", () => {
   });
 
   it("should coerce boolean/number values", () => {
-    process.env.APP_BOOL = "true";
+    process.env.APP_BOOL = "true"; // coerce bools
+    process.env.APP_INT_QUOTED = '"1"'; // leave numbers in strings alone
+    process.env.APP_UNSAFE_NUMBER = "111372124383428608"; // leave unsafe numbers alone
     mock({
-      "/app/.env": "APP_INT=1",
+      "/app/.env": "APP_INT=1", // coerce ints
     });
 
     const loader = new EnvLoader("/app");
     const output = loader.load("app");
     expect(output.bool).toBe(true);
     expect(output.int).toBe(1);
+    expect(output.intQuoted).toBe("1");
+    expect(output.unsafeNumber).toBe("111372124383428608");
   });
 });
 

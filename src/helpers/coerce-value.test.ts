@@ -8,4 +8,5 @@ it("should coerce booleans", () => {
   expect(coerceValue("1.0")).toBe(1);
   expect(coerceValue("1.1")).toBe(1.1);
   expect(coerceValue("test")).toBe("test");
+  expect(coerceValue('"test"')).toBe("test");
 });
