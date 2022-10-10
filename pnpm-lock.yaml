@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/dedent': ^0.7.0
   '@types/flat': ^5.0.2
   '@types/minimist': ^1.2.2
   '@types/mock-fs': ^4.13.1
@@ -8,11 +9,13 @@ specifiers:
   camel-case: ^4.1.2
   comment-json: ^4.2.3
   constant-case: ^3.0.4
+  dedent: ^0.7.0
   find-up: ^6.3.0
   flat: ^5.0.2
   merge: ^2.1.1
   minimist: ^1.2.6
   mock-fs: ^5.1.4
+  toml: ^3.0.0
   tsup: ^6.2.2
   typescript: ^4.7.4
   vitest: ^0.22.1
@@ -26,13 +29,16 @@ dependencies:
   flat: 5.0.2
   merge: 2.1.1
   minimist: 1.2.6
+  toml: 3.0.0
   yaml: 2.1.1
 
 devDependencies:
+  '@types/dedent': 0.7.0
   '@types/flat': 5.0.2
   '@types/minimist': 1.2.2
   '@types/mock-fs': 4.13.1
   '@types/node': 16.11.49
+  dedent: 0.7.0
   mock-fs: 5.1.4
   tsup: 6.2.2_typescript@4.7.4
   typescript: 4.7.4
@@ -87,6 +93,10 @@ packages:
 
   /@types/chai/4.3.3:
     resolution: {integrity: sha512-hC7OMnszpxhZPduX+m+nrx+uFoLkWOMiR4oa/AZF3MuSETYTZmFfJAHqZEM8MVlvfG7BEUcgvtwoCTxBp6hm3g==}
+    dev: true
+
+  /@types/dedent/0.7.0:
+    resolution: {integrity: sha512-EGlKlgMhnLt/cM4DbUSafFdrkeJoC9Mvnj0PUCU7tFmTjMjNRT957kXCx0wYm3JuEq4o4ZsS5vG+NlkM2DMd2A==}
     dev: true
 
   /@types/flat/5.0.2:
@@ -260,6 +270,10 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.2
+    dev: true
+
+  /dedent/0.7.0:
+    resolution: {integrity: sha512-Q6fKUPqnAHAyhiUgFU7BUzLiv0kd8saH9al7tnu5Q/okj6dnupxyTgFIBjVzJATdfIAm9NAsvXNzjaKa+bxVyA==}
     dev: true
 
   /deep-eql/3.0.1:
@@ -1257,6 +1271,10 @@ packages:
     dependencies:
       is-number: 7.0.0
     dev: true
+
+  /toml/3.0.0:
+    resolution: {integrity: sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==}
+    dev: false
 
   /tr46/1.0.1:
     resolution: {integrity: sha512-dTpowEjclQ7Kgx5SdBkqRzVhERQXov8/l9Ft9dVM9fmg0W0KQSVaXX9T4i6twCPNtYiZM53lpSSUAwJbFPOHxA==}

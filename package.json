@@ -20,10 +20,12 @@
     "prepack": "pnpm run build"
   },
   "devDependencies": {
+    "@types/dedent": "^0.7.0",
     "@types/flat": "^5.0.2",
     "@types/minimist": "^1.2.2",
     "@types/mock-fs": "^4.13.1",
     "@types/node": "^16",
+    "dedent": "^0.7.0",
     "mock-fs": "^5.1.4",
     "tsup": "^6.2.2",
     "typescript": "^4.7.4",
@@ -37,6 +39,7 @@
     "flat": "^5.0.2",
     "merge": "^2.1.1",
     "minimist": "^1.2.6",
+    "toml": "^3.0.0",
     "yaml": "^2.1.1"
   }
 }
