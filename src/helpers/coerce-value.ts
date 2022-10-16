@@ -1,4 +1,4 @@
-const NUMBER_REGEX = /^[0-9\.]{1,16}$/;
+const NUMBER_REGEX = /^-?[0-9\.]{1,16}$/;
 const STRING_REGEX = /^"(.*)"$/;
 const NEWLINE_REGEX = /\\n/g;
 

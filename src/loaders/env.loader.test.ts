@@ -1,6 +1,6 @@
-import { EnvLoader } from "./env.loader.js";
 import mock from "mock-fs";
-import { afterAll, describe, it, expect } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
+import { EnvLoader } from "./env.loader.js";
 
 afterAll(() => {
   mock.restore();
@@ -23,7 +23,7 @@ describe("loader", () => {
       "/app/.env.local": "APP_LOCAL_VALUE=local",
     });
 
-    const loader = new EnvLoader("/app");
+    const loader = new EnvLoader({ cwd: "/app" });
     const output = loader.load("app");
     expect(output.envValue).toBe("env");
     expect(output.localValue).toBe("local");
@@ -31,7 +31,7 @@ describe("loader", () => {
 
   it("should look in parent directories for .env files", () => {
     mock({ "/app/.env": "APP_TEST_VALUE=test_value" });
-    const loader = new EnvLoader("/app/packages/test-app");
+    const loader = new EnvLoader({ cwd: "/app/packages/test-app" });
     const output = loader.load("app");
     expect(output.testValue).toBe("test_value");
   });
@@ -46,7 +46,7 @@ describe("loader", () => {
       "/app/.env.production": "APP_PRODUCTION_ONLY_VALUE=production",
     });
 
-    const loader = new EnvLoader("/app");
+    const loader = new EnvLoader({ cwd: "/app" });
     const output = loader.load("app");
     expect(output.globalEnvValue).toBe("global");
     expect(output.globalFileValue).toBe("global");
@@ -57,7 +57,7 @@ describe("loader", () => {
   it("should support nested keys with __", () => {
     process.env.APP_LOADED_VALUE__NESTED = "loaded";
     mock({ "/app/.env": "APP_FILE_VALUE__NESTED=file" });
-    const loader = new EnvLoader("/app");
+    const loader = new EnvLoader({ cwd: "/app" });
     const output = loader.load("app");
     expect(output.fileValue.nested).toBe("file");
     expect(output.loadedValue.nested).toBe("loaded");
@@ -79,12 +79,45 @@ describe("loader", () => {
       "/app/.env": "APP_INT=1", // coerce ints
     });
 
-    const loader = new EnvLoader("/app");
+    const loader = new EnvLoader({ cwd: "/app" });
     const output = loader.load("app");
     expect(output.bool).toBe(true);
     expect(output.int).toBe(1);
     expect(output.intQuoted).toBe("1");
     expect(output.unsafeNumber).toBe("111372124383428608");
+  });
+
+  it("options.loadIntoEnv", () => {
+    mock({
+      "/app/.env": "APP_TEST_VALUE=test_value",
+    });
+
+    const loader = new EnvLoader({ cwd: "/app", loadIntoEnv: true });
+    const output = loader.load("app");
+    expect(output.testValue).toBe("test_value");
+    expect(process.env.APP_TEST_VALUE).toBe("test_value");
+  });
+
+  it("options.throwUnprefixed", () => {
+    mock({
+      "/app/.env": "APP_VALUE=test\nUNPREFIXED_VALUE=unprefixed",
+    });
+
+    const enabled = new EnvLoader({ cwd: "/app", throwOnUnprefixed: true });
+    expect(() => enabled.load("app")).toThrowErrorMatchingSnapshot();
+    const disabled = new EnvLoader({ cwd: "/app", throwOnUnprefixed: false });
+    expect(() => disabled.load("app")).not.toThrow();
+  });
+
+  it("options.throwOnEmpty", () => {
+    mock({
+      "/app/.env": "APP_VALUE=test\nEMPTY_VALUE=",
+    });
+
+    const enabled = new EnvLoader({ cwd: "/app", throwOnEmpty: true });
+    expect(() => enabled.load("app")).toThrowErrorMatchingSnapshot();
+    const disabled = new EnvLoader({ cwd: "/app", throwOnEmpty: false });
+    expect(() => disabled.load("app")).not.toThrow();
   });
 });
 
