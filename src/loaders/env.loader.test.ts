@@ -1,38 +1,34 @@
-import mock from "mock-fs";
-import { afterAll, describe, expect, it } from "vitest";
+import { vol } from "memfs";
+import { describe, expect, it } from "vitest";
 import { EnvLoader } from "./env.loader.js";
-
-afterAll(() => {
-  mock.restore();
-});
+import { createLoaderContext } from "../helpers/create-loader-context.js";
 
 describe("loader", () => {
   it("should load flags from process.env", () => {
-    mock();
     process.env.APP_CLIENT_TOKEN = "test";
     process.env.UNPREFIXED_VALUE = "never";
     const loader = new EnvLoader();
-    const output = loader.load("app");
+    const output = loader.load("app", createLoaderContext());
     expect(output.clientToken).toBe("test");
     expect(output.unprefixedValue).toBeUndefined();
   });
 
   it("should load flags from .env and .env.local files", () => {
-    mock({
+    vol.fromJSON({
       "/app/.env": "APP_ENV_VALUE=env",
       "/app/.env.local": "APP_LOCAL_VALUE=local",
     });
 
     const loader = new EnvLoader({ cwd: "/app" });
-    const output = loader.load("app");
+    const output = loader.load("app", createLoaderContext());
     expect(output.envValue).toBe("env");
     expect(output.localValue).toBe("local");
   });
 
   it("should look in parent directories for .env files", () => {
-    mock({ "/app/.env": "APP_TEST_VALUE=test_value" });
+    vol.fromJSON({ "/app/.env": "APP_TEST_VALUE=test_value", "/app/packages/test-app": null });
     const loader = new EnvLoader({ cwd: "/app/packages/test-app" });
-    const output = loader.load("app");
+    const output = loader.load("app", createLoaderContext());
     expect(output.testValue).toBe("test_value");
   });
 
@@ -40,14 +36,14 @@ describe("loader", () => {
     process.env.NODE_ENV = "staging";
     process.env.APP_GLOBAL_ENV_VALUE = "global";
 
-    mock({
+    vol.fromJSON({
       "/app/.env": "APP_GLOBAL_FILE_VALUE=global",
       "/app/.env.staging": "APP_STAGING_ONLY_VALUE=staging",
       "/app/.env.production": "APP_PRODUCTION_ONLY_VALUE=production",
     });
 
     const loader = new EnvLoader({ cwd: "/app" });
-    const output = loader.load("app");
+    const output = loader.load("app", createLoaderContext());
     expect(output.globalEnvValue).toBe("global");
     expect(output.globalFileValue).toBe("global");
     expect(output.stagingOnlyValue).toBe("staging");
@@ -56,16 +52,16 @@ describe("loader", () => {
 
   it("should support nested keys with __", () => {
     process.env.APP_LOADED_VALUE__NESTED = "loaded";
-    mock({ "/app/.env": "APP_FILE_VALUE__NESTED=file" });
+    vol.fromJSON({ "/app/.env": "APP_FILE_VALUE__NESTED=file" });
     const loader = new EnvLoader({ cwd: "/app" });
-    const output = loader.load("app");
+    const output = loader.load("app", createLoaderContext());
     expect(output.fileValue.nested).toBe("file");
     expect(output.loadedValue.nested).toBe("loaded");
   });
 
   it("should merge values with multiple environment variables", () => {
     process.env.APP_LOADED_VALUE__NESTED = "loaded";
-    mock({
+    vol.fromJSON({
       "/app/.env": "TEST_KEY_ONE=one\nTEST_KEY_TWO=default",
       "/app/.env.development": "TEST_KEY_TWO=two",
     });
@@ -75,12 +71,12 @@ describe("loader", () => {
     process.env.APP_BOOL = "true"; // coerce bools
     process.env.APP_INT_QUOTED = '"1"'; // leave numbers in strings alone
     process.env.APP_UNSAFE_NUMBER = "111372124383428608"; // leave unsafe numbers alone
-    mock({
+    vol.fromJSON({
       "/app/.env": "APP_INT=1", // coerce ints
     });
 
     const loader = new EnvLoader({ cwd: "/app" });
-    const output = loader.load("app");
+    const output = loader.load("app", createLoaderContext());
     expect(output.bool).toBe(true);
     expect(output.int).toBe(1);
     expect(output.intQuoted).toBe("1");
@@ -88,36 +84,40 @@ describe("loader", () => {
   });
 
   it("options.loadIntoEnv", () => {
-    mock({
+    vol.fromJSON({
       "/app/.env": "APP_TEST_VALUE=test_value",
     });
 
     const loader = new EnvLoader({ cwd: "/app", loadIntoEnv: true });
-    const output = loader.load("app");
+    const output = loader.load("app", createLoaderContext());
     expect(output.testValue).toBe("test_value");
     expect(process.env.APP_TEST_VALUE).toBe("test_value");
   });
 
   it("options.throwUnprefixed", () => {
-    mock({
+    vol.fromJSON({
       "/app/.env": "APP_VALUE=test\nUNPREFIXED_VALUE=unprefixed",
     });
 
     const enabled = new EnvLoader({ cwd: "/app", throwOnUnprefixed: true });
-    expect(() => enabled.load("app")).toThrowErrorMatchingSnapshot();
+    expect(() => enabled.load("app", createLoaderContext())).toThrowErrorMatchingInlineSnapshot(
+      `[Error: Unprefixed environment variable "UNPREFIXED_VALUE" found in /app/.env]`
+    );
     const disabled = new EnvLoader({ cwd: "/app", throwOnUnprefixed: false });
-    expect(() => disabled.load("app")).not.toThrow();
+    expect(() => disabled.load("app", createLoaderContext())).not.toThrow();
   });
 
   it("options.throwOnEmpty", () => {
-    mock({
+    vol.fromJSON({
       "/app/.env": "APP_VALUE=test\nEMPTY_VALUE=",
     });
 
     const enabled = new EnvLoader({ cwd: "/app", throwOnEmpty: true });
-    expect(() => enabled.load("app")).toThrowErrorMatchingSnapshot();
+    expect(() => enabled.load("app", createLoaderContext())).toThrowErrorMatchingInlineSnapshot(
+      `[Error: Malformed .env content on line 2: "EMPTY_VALUE="]`
+    );
     const disabled = new EnvLoader({ cwd: "/app", throwOnEmpty: false });
-    expect(() => disabled.load("app")).not.toThrow();
+    expect(() => disabled.load("app", createLoaderContext())).not.toThrow();
   });
 });
 

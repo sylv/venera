@@ -1,6 +1,6 @@
 import minimist from "minimist";
 import { constantCaseToPath } from "../helpers/constant-case-to-path.js";
-import flat from "flat";
+import { unflatten } from "flat";
 import { Loader } from "./loader.js";
 
 export class ArgsLoader extends Loader {
@@ -13,6 +13,6 @@ export class ArgsLoader extends Loader {
       flattened[path] = args[key];
     }
 
-    return flat.unflatten<Record<string, string>, Record<string, string>>(flattened);
+    return unflatten<Record<string, string>, Record<string, string>>(flattened);
   }
 }

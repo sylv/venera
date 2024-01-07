@@ -30,11 +30,8 @@ Another config loader, intended for loading configuration files for services. Fo
 
 ```ts
 import { loadConfig } from "@ryanke/venera";
-import mock from "mock-fs";
 
-// create some fake files on disk, totally unnecessary for
-// real world use but to keep this example simple
-mock({
+mockFS({
   // prefixed environment variables
   "./.env": "MYAPP_REDIS__PASSWORD=youshallnotpass",
   // numbers/booleans in env variables will be parsed as numbers/booleans
@@ -49,8 +46,12 @@ mock({
   }),
 });
 
-// "venera" should be the name of your app
-const data = loadConfig("myapp");
+const data = loadConfig("myapp", {
+  // if you want to add another file path, you can do so here.
+  // this only works if a loader implements `pathHints`.
+  // fs loaders do (yaml, json, toml currently). anything else is silently ignored.
+  pathHints: ["config.yaml"],
+});
 // data now looks like:
 // {
 //   message: "Very cool",
@@ -58,11 +59,11 @@ const data = loadConfig("myapp");
 //     host: "127.0.0.1",
 //     password: "youshallnotpass",
 //     port: 6379,
-//   }
+//   },
+//   Symbol(sourcePaths): ['/wherever/.myapprc.json', '/wherever/.env']
 // }
 
 // "zod" is a great option to parse the resulting schema.
-// "class-validator" might also be convenient if you already use it.
 // this is of course optional, by this point its just an object.
 const config = validateConfig(data);
 export { config };
@@ -71,10 +72,13 @@ export { config };
 ## custom loaders
 
 ```ts
-import { loadConfig, constantCaseToPath, DEFAULT_LOADERS } from "@ryanke/venera";
+import { loadConfig, constantCaseToPath, DEFAULT_LOADERS, Loader, LoaderContext } from "@ryanke/venera";
 
 export class MyLoader extends Loader {
-  load(appName: string): Record<string, any> {
+  load(appName: string, context: LoaderContext): Record<string, any> {
+    context.sourcePaths.push("/some/path/this/loader/loaded");
+    context.pathHints; // present if passed to loadConfig()
+
     return {
       // its up to the loader to handle converting keys to camel case, unflattening the result, etc.
       // you can look at the included loaders for more info, specifically the .env or arg loader.

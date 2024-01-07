@@ -1,5 +1,5 @@
 import toml from "toml";
-import { FSLoader, FSLoaderData } from "./fs.loader.js";
+import { FSLoader, type FSLoaderData } from "./fs.loader.js";
 
 export class TOMLLoader extends FSLoader {
   readonly extensions = ["toml"];

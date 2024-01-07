@@ -1,4 +1,4 @@
-import { FSLoader, FSLoaderData } from "./fs.loader.js";
+import { FSLoader, type FSLoaderData } from "./fs.loader.js";
 import { parse } from "comment-json";
 
 export class JSONLoader extends FSLoader {

@@ -1,27 +1,7 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@atlasbot/configs/tsconfig/esm.json",
+  "include": ["src"],
   "compilerOptions": {
-    "module": "node16",
-    "moduleResolution": "node16",
-    "moduleDetection": "force",
-    "target": "es2021",
-    "lib": ["es2021"],
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "jsx": "react",
-    "declaration": true,
-    "pretty": true,
-    "newLine": "lf",
-    "stripInternal": true,
-    "strict": true,
-    "noImplicitOverride": true,
-    "noUnusedLocals": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noEmitOnError": true,
-    "forceConsistentCasingInFileNames": true,
-    "importsNotUsedAsValues": "error",
-    "skipLibCheck": true,
-    "isolatedModules": true
+    "outDir": "dist"
   }
 }

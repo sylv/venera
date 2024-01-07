@@ -1,27 +1,36 @@
-import mock from "mock-fs";
-import { afterAll, beforeAll, expect, it } from "vitest";
+import { vol } from "memfs";
+import { beforeEach } from "vitest";
+import { expect, it } from "vitest";
+import { createLoaderContext } from "../../helpers/create-loader-context.js";
 import { JSONLoader } from "./json.loader.js";
 
-const JSON_CONTENT = {
-  clientToken: "value",
-  number: 1,
-  nested: {
-    key: "value",
-  },
-};
-
-beforeAll(() => {
-  mock({
-    "/app/.apprc.json": JSON.stringify(JSON_CONTENT),
+beforeEach(() => {
+  vol.fromJSON({
+    "/app/.apprc.json": JSON.stringify({ hello: "world" }),
+    "/app/config.json": JSON.stringify({ hello: "world" }),
   });
-});
-
-afterAll(() => {
-  mock.restore();
 });
 
 it("should parse json files", () => {
   const loader = new JSONLoader("/app");
-  const output = loader.load("app");
-  expect(output).toEqual(JSON_CONTENT);
+  const output = loader.load("app", createLoaderContext());
+  expect(output).toMatchInlineSnapshot(`
+    {
+      "hello": "world",
+    }
+  `);
+});
+
+it("should parse json files with hints", () => {
+  const loader = new JSONLoader("/app");
+  const output = loader.load("app", {
+    sourcePaths: [],
+    pathHints: ["config.json"],
+  });
+
+  expect(output).toMatchInlineSnapshot(`
+    {
+      "hello": "world",
+    }
+  `);
 });

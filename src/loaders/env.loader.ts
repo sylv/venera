@@ -1,10 +1,10 @@
-import { constantCase } from "constant-case";
-import { findUpSync } from "find-up";
-import flat from "flat";
+import { constantCase } from "change-case";
+import { unflatten } from "flat";
 import fs from "fs";
 import { constantCaseToPath } from "../helpers/constant-case-to-path.js";
+import { findUp } from "../helpers/find-up.js";
 import { coerceValue } from "../index.js";
-import { Loader } from "./loader.js";
+import { Loader, type LoaderContext } from "./loader.js";
 
 export interface EnvLoaderOptions {
   cwd?: string;
@@ -32,7 +32,7 @@ export class EnvLoader extends Loader {
     super();
   }
 
-  public load(appName: string) {
+  public load(appName: string, context: LoaderContext) {
     const flattened: Record<string, any> = {};
     const nodeEnv = EnvLoader.VALID_ENVIRONMENTS.has(process.env.NODE_ENV!) && process.env.NODE_ENV;
     const prefix = `${constantCase(appName)}_`;
@@ -54,10 +54,11 @@ export class EnvLoader extends Loader {
     const fileNames = [".env", ".env.local"];
     if (nodeEnv) fileNames.unshift(`.env.${nodeEnv.toLowerCase()}`);
     for (const fileName of fileNames) {
-      const filePath = findUpSync(fileName, { cwd });
+      const filePath = findUp(fileName, cwd);
       if (!filePath) continue;
-      const fileContent = fs.readFileSync(filePath);
-      const parsed = this.parse(fileContent.toString());
+      context.sourcePaths.push(filePath);
+      const fileContent = fs.readFileSync(filePath, "utf8");
+      const parsed = this.parse(fileContent);
       for (const key in parsed) {
         if (this.options.loadIntoEnv !== false) {
           // defaults to true because its convenient, sometimes external tools
@@ -79,11 +80,11 @@ export class EnvLoader extends Loader {
       }
     }
 
-    return flat.unflatten<Record<string, string>, Record<string, any>>(flattened);
+    return unflatten<Record<string, string>, Record<string, any>>(flattened);
   }
 
   public parse(content: string) {
-    const lines = content.toString().trim().replace(EnvLoader.COMMENT_REGEX, "").split("\n");
+    const lines = content.trim().replace(EnvLoader.COMMENT_REGEX, "").split("\n");
     const result: Record<string, any> = {};
     for (let idx = 0; idx < lines.length; idx++) {
       const line = lines[idx]!;

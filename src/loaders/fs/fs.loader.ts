@@ -1,8 +1,8 @@
-import { findUpSync } from "find-up";
 import fs from "fs";
 import os from "os";
-import path from "path";
-import { Loader } from "../loader.js";
+import path, { extname, isAbsolute } from "path";
+import { findUp } from "../../helpers/find-up.js";
+import { Loader, type LoaderContext } from "../loader.js";
 
 export interface FSLoaderData {
   extension?: string;
@@ -18,7 +18,7 @@ export abstract class FSLoader extends Loader {
 
   abstract parse(text: string, data: FSLoaderData): Record<string, any> | undefined;
 
-  public load(appName: string) {
+  public load(appName: string, context: LoaderContext) {
     const relativeFiles = [`.${appName}rc`, `${appName}.config`];
     const absoluteFiles = [
       // /home/user/.config/app/config
@@ -36,11 +36,25 @@ export abstract class FSLoader extends Loader {
       absoluteFiles.push(path.join("/etc", appName, "config"));
     }
 
+    if (context.pathHints) {
+      for (const hint of context.pathHints) {
+        const hasExtension = this.extensions.some((ext) => hint.endsWith(`.${ext}`));
+        if (!hasExtension) continue;
+        const isRelative = !isAbsolute(hint);
+        if (isRelative) {
+          relativeFiles.push(hint);
+        } else {
+          absoluteFiles.push(hint);
+        }
+      }
+    }
+
     for (const relativeFile of this.getPathsWithExtensions(relativeFiles)) {
-      const absoluteFile = findUpSync(relativeFile, { cwd: this.cwd });
+      const absoluteFile = findUp(relativeFile, this.cwd);
       if (absoluteFile) {
         const parsed = this.tryLoadAbsoluteFile(absoluteFile);
         if (parsed) {
+          context.sourcePaths.push(absoluteFile);
           return parsed;
         }
       }
@@ -48,28 +62,36 @@ export abstract class FSLoader extends Loader {
 
     for (const absoluteFile of this.getPathsWithExtensions(absoluteFiles)) {
       const parsed = this.tryLoadAbsoluteFile(absoluteFile);
-      if (parsed) return parsed;
+      if (parsed) {
+        context.sourcePaths.push(absoluteFile);
+        return parsed;
+      }
     }
   }
 
   private tryLoadAbsoluteFile(filePath: string) {
     try {
-      const content = fs.readFileSync(filePath);
+      const content = fs.readFileSync(filePath, "utf8");
       const extension = this.extensions.find((ext) => filePath.endsWith(`.${ext}`));
-      const parsed = this.parse(content.toString(), { extension, filePath });
+      const parsed = this.parse(content, { extension, filePath });
       if (parsed) return parsed;
     } catch (error: any) {
       if (error.code !== "ENOENT") throw error;
     }
   }
 
-  private getPathsWithExtensions(withoutExtensions: string[]) {
-    const paths = withoutExtensions.reduce((acc, path) => {
+  private getPathsWithExtensions(maybeWithoutExtensions: string[]) {
+    const paths = maybeWithoutExtensions.flatMap((path) => {
+      const existingExtension = extname(path);
+      if (existingExtension && this.extensions.includes(existingExtension.slice(1))) {
+        return [path];
+      }
+
       const resolved: string[] = [];
       if (!this.requireExtension) resolved.push(path);
       for (const extension of this.extensions) resolved.push(path + "." + extension);
-      return acc.concat(resolved);
-    }, [] as string[]);
+      return resolved;
+    });
 
     return paths;
   }

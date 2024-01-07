@@ -1,15 +1,11 @@
-import { loadConfig } from "./load-config.js";
-import mock from "mock-fs";
-import { afterAll, expect, it, vi } from "vitest";
-
-afterAll(() => {
-  mock.restore();
-});
+import { vol } from "memfs";
+import { expect, it, vi } from "vitest";
+import { SOURCE_PATHS, loadConfig } from "./load-config.js";
 
 it("should load configs", () => {
   process.env.APP_ENV = "env";
   vi.spyOn(process, "cwd").mockReturnValue("/project/packages/app");
-  mock({
+  vol.fromJSON({
     "/project/packages/app/.env": "APP_KEY=env file # a test comment",
     "/project/.apprc.yaml": `yaml: 'yaml file'`,
   });
@@ -19,12 +15,13 @@ it("should load configs", () => {
     env: "env",
     key: "env file",
     yaml: "yaml file",
+    [SOURCE_PATHS]: ["/project/.apprc.yaml", "/project/packages/app/.env"],
   });
 });
 
 it("should allow environment variables to override file values", () => {
   process.env.APP_VALUE = "override";
-  mock({ "/project/.apprc.json": JSON.stringify({ value: "never" }) });
+  vol.fromJSON({ "/project/.apprc.json": JSON.stringify({ value: "never" }) });
   const data = loadConfig<any>("app");
   expect(data.value).toEqual("override");
 });

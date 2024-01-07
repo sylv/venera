@@ -1,10 +1,12 @@
 import dedent from "dedent";
-import mock from "mock-fs";
-import { afterAll, beforeAll, expect, it } from "vitest";
+import { vol } from "memfs";
+import { beforeEach } from "vitest";
+import { expect, it } from "vitest";
+import { createLoaderContext } from "../../helpers/create-loader-context.js";
 import { TOMLLoader } from "./toml.loader.js";
 
-beforeAll(() => {
-  mock({
+beforeEach(() => {
+  vol.fromJSON({
     "/app/.apprc.toml": dedent`
         test = "value"
         number = 1
@@ -15,18 +17,16 @@ beforeAll(() => {
   });
 });
 
-afterAll(() => {
-  mock.restore();
-});
-
 it("should parse yaml files", () => {
   const loader = new TOMLLoader("/app");
-  const output = loader.load("app");
-  expect(output).toEqual({
-    test: "value",
-    number: 1,
-    nested: {
-      key: "value",
-    },
-  });
+  const output = loader.load("app", createLoaderContext());
+  expect(output).toMatchInlineSnapshot(`
+    {
+      "nested": {
+        "key": "value",
+      },
+      "number": 1,
+      "test": "value",
+    }
+  `);
 });
