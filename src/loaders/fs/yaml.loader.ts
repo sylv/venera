@@ -13,3 +13,25 @@ export class YAMLLoader extends FSLoader {
     }
   }
 }
+
+if (import.meta.vitest) {
+  const { it, expect, beforeEach } = import.meta.vitest;
+  const { vol } = await import("memfs");
+  const { createLoaderContext } = await import("../../helpers/create-loader-context.js");
+
+  beforeEach(() => {
+    vol.fromJSON({
+      "/app/.apprc.yaml": JSON.stringify({ hello: "world" }),
+    });
+  });
+
+  it("should parse yaml files", () => {
+    const loader = new YAMLLoader("/app");
+    const output = loader.load("app", createLoaderContext());
+    expect(output).toMatchInlineSnapshot(`
+      {
+        "hello": "world",
+      }
+    `);
+  });
+}

@@ -16,3 +16,14 @@ export class ArgsLoader extends Loader {
     return unflatten<Record<string, string>, Record<string, string>>(flattened);
   }
 }
+
+if (import.meta.vitest) {
+  const { it, expect } = import.meta.vitest;
+
+  it("should load flags from process.argv", () => {
+    process.argv.push("--test", "value");
+    const loader = new ArgsLoader();
+    const output = loader.load("app");
+    expect(output.test).toBe("value");
+  });
+}
