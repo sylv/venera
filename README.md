@@ -1,15 +1,18 @@
 # venera
 
+A config loader for services that does the Right Thing™️ by default.
+
+For libraries, consider something like [cosmiconfig](https://github.com/davidtheclark/cosmiconfig). This is mostly for my own use because I can't find a single library that does what I want, but it's free for anyone to use, as long as you're fine with subpar documentation.
+
 - [venera](#venera)
   - [sources](#sources)
   - [usage](#usage)
   - [custom loaders](#custom-loaders)
   - [todo](#todo)
 
-Another config loader, intended for loading configuration files for services. For libraries, consider something like [cosmiconfig](https://github.com/davidtheclark/cosmiconfig). This is mostly for my own use because I can't find a single library that does what I want, but it's free for anyone to use, as long as you're fine with subpar documentation.
-
 ## sources
 
+> [!NOTE]
 > If multiple sources are found, they will be merged with loaders last in `options.loaders` taking priority.
 
 - `--arg="values"` from process.argv
@@ -99,6 +102,4 @@ const data = loadConfig<Partial<AppConfig>>("app-name", {
 
 ## todo
 
-- [ ] Option to turn off merging and instead just return the first config found. This would have to be implemented per-loader to make sense, because I think it would be nice if you could turn off merging and still override .rc values with environment variables, sometimes its just convenient.
-- [ ] Output sources for each config value, maybe even per-property with symbols declaring which properties are from where so you could do something like `The key CLIENT_TOKEN in config /home/user/.env is invalid` or something.
-- [ ] TOML/INI support? The more file system loaders are added the more startup slows down checking for all of them, realistically I think YAML is as human-readable as you need anyway, but it would be nice to throw in.
+- [ ] Output per-property sources so you could do something like `The key CLIENT_TOKEN in config /home/user/.env is invalid`.
