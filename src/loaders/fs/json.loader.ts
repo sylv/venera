@@ -1,4 +1,4 @@
-import { parse } from "comment-json";
+import stripComments from "strip-json-comments";
 import { FSLoader, type FSLoaderData } from "./fs.loader.js";
 
 export class JSONLoader extends FSLoader {
@@ -6,7 +6,7 @@ export class JSONLoader extends FSLoader {
   readonly requireExtension = false;
   public parse(text: string, { extension }: FSLoaderData) {
     try {
-      const result = parse(text);
+      const result = JSON.parse(stripComments(text));
       if (typeof result === "object" && result !== null) {
         return result;
       } else {
